@@ -3,7 +3,8 @@
 // Create file: app/blog/page.tsx
 
 import Link from 'next/link';
-import { ArrowRight, Calendar, User } from 'lucide-react';
+import Image from 'next/image';
+import { ArrowRight, Calendar, User, Clock } from 'lucide-react';
 
 export const metadata = {
   title: 'Blog | Paira Art.6',
@@ -14,61 +15,91 @@ export default async function BlogPage() {
   // TODO: Fetch from Sanity
   // const posts = await sanityFetch(allBlogPostsQuery);
 
-  // Demo blog posts
+  // Demo blog posts with full content
   const posts = [
     {
       _id: '1',
       slug: 'my-journey-into-photography',
       title: 'My Journey Into Photography',
-      excerpt: 'How I discovered my passion for capturing moments and turning them into stories. From humble beginnings to professional work.',
+      excerpt: 'How I discovered my passion for capturing moments and turning them into stories. From humble beginnings to professional work in Kampala.',
       mainImage: 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=800&q=80',
       publishedAt: '2024-01-15',
-      author: { name: 'Paira Art.6' },
+      readTime: '8 min read',
+      category: 'Personal Story',
+      author: { 
+        name: 'Paira Art.6',
+        bio: 'Ugandan photographer and cinematographer based in Kampala'
+      },
     },
     {
       _id: '2',
       slug: 'why-i-love-35mm-lens',
-      title: 'Why I Love the 35mm Lens',
-      excerpt: "The 35mm lens has become my signature. Here's why it's perfect for fashion and lifestyle photography.",
+      title: 'Why the 35mm Lens is My Signature Choice',
+      excerpt: "The 35mm lens has become my signature tool. Here's why it's perfect for fashion and lifestyle photography, and how it creates that natural, real-life feel.",
       mainImage: 'https://images.unsplash.com/photo-1606166419283-d00f1aa47c8c?w=800&q=80',
       publishedAt: '2024-01-10',
-      author: { name: 'Paira Art.6' },
+      readTime: '6 min read',
+      category: 'Photography Tips',
+      author: { 
+        name: 'Paira Art.6',
+        bio: 'Ugandan photographer and cinematographer based in Kampala'
+      },
     },
     {
       _id: '3',
       slug: 'shooting-in-kampala',
       title: 'Shooting in Kampala: My Favorite Locations',
-      excerpt: 'Kampala offers incredible backdrops for photography. Here are my top 5 favorite spots for photoshoots.',
+      excerpt: 'Kampala offers incredible backdrops for photography. Discover my top 5 favorite spots for photoshoots and why they work so well.',
       mainImage: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&q=80',
       publishedAt: '2024-01-05',
-      author: { name: 'Paira Art.6' },
+      readTime: '7 min read',
+      category: 'Behind The Scenes',
+      author: { 
+        name: 'Paira Art.6',
+        bio: 'Ugandan photographer and cinematographer based in Kampala'
+      },
     },
     {
       _id: '4',
-      slug: 'tips-for-natural-light',
+      slug: 'mastering-natural-light',
       title: 'Mastering Natural Light Photography',
-      excerpt: 'Natural light can make or break a photo. Learn how I use golden hour and shadows to create dramatic images.',
+      excerpt: 'Natural light can make or break a photo. Learn how I use golden hour, shadows, and ambient light to create dramatic, emotional images.',
       mainImage: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&q=80',
       publishedAt: '2023-12-20',
-      author: { name: 'Paira Art.6' },
+      readTime: '10 min read',
+      category: 'Photography Tips',
+      author: { 
+        name: 'Paira Art.6',
+        bio: 'Ugandan photographer and cinematographer based in Kampala'
+      },
     },
     {
       _id: '5',
       slug: 'behind-the-scenes-fashion-shoot',
       title: 'Behind the Scenes: Fashion Editorial Shoot',
-      excerpt: 'A look behind the camera at a recent fashion editorial shoot. The planning, execution, and final results.',
+      excerpt: 'A look behind the camera at a recent fashion editorial shoot. The planning, team coordination, execution, and final results.',
       mainImage: 'https://images.unsplash.com/photo-1490725263030-1f0521cec8ec?w=800&q=80',
       publishedAt: '2023-12-15',
-      author: { name: 'Paira Art.6' },
+      readTime: '9 min read',
+      category: 'Behind The Scenes',
+      author: { 
+        name: 'Paira Art.6',
+        bio: 'Ugandan photographer and cinematographer based in Kampala'
+      },
     },
     {
       _id: '6',
       slug: 'color-grading-secrets',
-      title: 'My Color Grading Secrets',
-      excerpt: 'The post-processing workflow I use to achieve soft tones and clean composition in my photography.',
+      title: 'My Color Grading Secrets Revealed',
+      excerpt: 'The complete post-processing workflow I use to achieve soft tones, clean composition, and that signature look in my photography.',
       mainImage: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&q=80',
       publishedAt: '2023-12-10',
-      author: { name: 'Paira Art.6' },
+      readTime: '12 min read',
+      category: 'Photography Tips',
+      author: { 
+        name: 'Paira Art.6',
+        bio: 'Ugandan photographer and cinematographer based in Kampala'
+      },
     },
   ];
 
@@ -90,7 +121,7 @@ export default async function BlogPage() {
             Blog
           </h1>
           <p className="subtitle animate-fade-in-slow max-w-2xl mx-auto">
-            Photography tips, creative insights, and behind-the-scenes stories
+            Photography tips, creative insights, and behind-the-scenes stories from my journey
           </p>
         </div>
       </section>
@@ -113,6 +144,10 @@ export default async function BlogPage() {
                   />
                 </div>
                 <div>
+                  <span className="inline-block px-4 py-1 bg-pumpkin-100 text-pumpkin-600 text-xs font-light rounded-full mb-4">
+                    {posts[0].category}
+                  </span>
+                  
                   <div className="flex items-center gap-4 mb-4 text-sm text-charcoal-500">
                     <span className="flex items-center gap-2">
                       <Calendar className="w-4 h-4" />
@@ -124,18 +159,20 @@ export default async function BlogPage() {
                     </span>
                     <span>•</span>
                     <span className="flex items-center gap-2">
-                      <User className="w-4 h-4" />
-                      {posts[0].author.name}
+                      <Clock className="w-4 h-4" />
+                      {posts[0].readTime}
                     </span>
                   </div>
+                  
                   <h2 className="font-display text-4xl md:text-5xl mb-6 group-hover:text-pumpkin-500 transition-colors duration-300">
                     {posts[0].title}
                   </h2>
                   <p className="text-charcoal-600 leading-relaxed text-lg mb-6">
                     {posts[0].excerpt}
                   </p>
+                  
                   <div className="flex items-center gap-2 text-pumpkin-500 font-light">
-                    Read More
+                    Read Full Story
                     <ArrowRight className="w-5 h-5 transform group-hover:translate-x-2 transition-transform duration-300" />
                   </div>
                 </div>
@@ -156,11 +193,14 @@ export default async function BlogPage() {
               >
                 <article className="card-luxury overflow-hidden h-full flex flex-col">
                   {/* Image */}
-                  <div className="aspect-[4/3] overflow-hidden">
+                  <div className="aspect-[4/3] overflow-hidden relative">
                     <div
                       className="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
                       style={{ backgroundImage: `url(${post.mainImage})` }}
                     />
+                    <span className="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur-sm text-charcoal-800 text-xs font-light rounded-full">
+                      {post.category}
+                    </span>
                   </div>
 
                   {/* Content */}
@@ -173,6 +213,11 @@ export default async function BlogPage() {
                           day: 'numeric',
                           year: 'numeric',
                         })}
+                      </span>
+                      <span>•</span>
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {post.readTime}
                       </span>
                     </div>
 

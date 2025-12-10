@@ -5,6 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 
 export default function HomePage() {
@@ -219,7 +220,16 @@ export default function HomePage() {
       <section className="py-32 bg-white">
         <div className="container-luxury">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div className="aspect-[3/4] bg-gradient-to-br from-pumpkin-100 to-pumpkin-200 rounded-lg" />
+            {/* Updated Image Section */}
+            <div className="aspect-[3/4] relative rounded-lg overflow-hidden">
+              <Image
+                src="/assets/paire-image1.jpg"
+                alt="Paira Art.6 - Muwulya Peter"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+            </div>
             
             <div>
               <p className="luxury-text mb-4">About the Artist</p>

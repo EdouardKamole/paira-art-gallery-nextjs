@@ -16,30 +16,51 @@ export default function ContactPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError('');
 
-    // TODO: Integrate with your backend or email service
-    // For now, just simulate submission
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
 
-    setIsSubmitting(false);
-    setSubmitted(true);
-    setFormData({ 
-      name: '', 
-      contactMethod: '', 
-      contactInfo: '', 
-      photoshootType: '', 
-      location: '', 
-      needServices: '', 
-      budget: '', 
-      message: '' 
-    });
+      const data = await response.json();
 
-    // Reset success message after 5 seconds
-    setTimeout(() => setSubmitted(false), 5000);
+      if (!response.ok) {
+        throw new Error(data.error || 'Something went wrong');
+      }
+
+      // Success!
+      console.log('✅ Form submitted successfully!');
+      setSubmitted(true);
+      setFormData({ 
+        name: '', 
+        contactMethod: '', 
+        contactInfo: '', 
+        photoshootType: '', 
+        location: '', 
+        needServices: '', 
+        budget: '', 
+        message: '' 
+      });
+
+      // Reset success message after 5 seconds
+      setTimeout(() => setSubmitted(false), 5000);
+
+    } catch (err) {
+      console.error('❌ Error submitting form:', err);
+      setError(err instanceof Error ? err.message : 'Failed to submit. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -53,8 +74,8 @@ export default function ContactPage() {
     {
       icon: Mail,
       label: 'Email',
-      value: 'pairaart6@gmail.com',
-      href: 'mailto:pairaart6@gmail.com',
+      value: 'peterpaira43@gmail.com',
+      href: 'mailto:peterpaira43@gmail.com',
     },
     {
       icon: Phone,
@@ -225,6 +246,15 @@ export default function ContactPage() {
                   <div className="p-6 bg-green-50 border border-green-200 rounded-lg animate-slide-down">
                     <p className="text-green-800 font-light">
                       ✓ Thank you! Your message has been sent successfully. I'll get back to you soon.
+                    </p>
+                  </div>
+                )}
+
+                {/* Error Message */}
+                {error && (
+                  <div className="p-6 bg-red-50 border border-red-200 rounded-lg animate-slide-down">
+                    <p className="text-red-800 font-light">
+                      ✗ {error}
                     </p>
                   </div>
                 )}

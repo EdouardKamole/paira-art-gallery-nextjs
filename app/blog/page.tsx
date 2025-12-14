@@ -1,5 +1,6 @@
 // app/blog/page.tsx
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowRight, Calendar, Clock } from 'lucide-react';
 import { client, urlFor } from '@/lib/sanity';
 
@@ -65,17 +66,23 @@ export default async function BlogPage() {
               className="block mb-20 group"
             >
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                <div className="aspect-[4/3] rounded-lg overflow-hidden">
-                  <div
-                    className="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                    style={{ 
-                      backgroundImage: `url(${urlFor(featuredPost.mainImage).width(800).quality(80).url()})` 
-                    }}
-                  />
+                <div className="aspect-[4/3] rounded-lg overflow-hidden bg-charcoal-100">
+                  {featuredPost.mainImage ? (
+                    <div
+                      className="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                      style={{ 
+                        backgroundImage: `url(${urlFor(featuredPost.mainImage).width(800).quality(80).url()})` 
+                      }}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-charcoal-400">
+                      <p>No image</p>
+                    </div>
+                  )}
                 </div>
                 <div>
                   <span className="inline-block px-4 py-1 bg-pumpkin-100 text-pumpkin-600 text-xs font-light rounded-full mb-4">
-                    {featuredPost.category}
+                    {featuredPost.category || 'Uncategorized'}
                   </span>
                   
                   <div className="flex items-center gap-4 mb-4 text-sm text-charcoal-500">
@@ -90,7 +97,7 @@ export default async function BlogPage() {
                     <span>•</span>
                     <span className="flex items-center gap-2">
                       <Clock className="w-4 h-4" />
-                      {featuredPost.readTime}
+                      {featuredPost.readTime || '5 min read'}
                     </span>
                   </div>
                   
@@ -124,15 +131,21 @@ export default async function BlogPage() {
                 >
                   <article className="card-luxury overflow-hidden h-full flex flex-col">
                     {/* Image */}
-                    <div className="aspect-[4/3] overflow-hidden relative">
-                      <div
-                        className="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                        style={{ 
-                          backgroundImage: `url(${urlFor(post.mainImage).width(800).quality(80).url()})` 
-                        }}
-                      />
+                    <div className="aspect-[4/3] overflow-hidden relative bg-charcoal-100">
+                      {post.mainImage ? (
+                        <div
+                          className="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                          style={{ 
+                            backgroundImage: `url(${urlFor(post.mainImage).width(800).quality(80).url()})` 
+                          }}
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-charcoal-400">
+                          <p className="text-sm">No image</p>
+                        </div>
+                      )}
                       <span className="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur-sm text-charcoal-800 text-xs font-light rounded-full">
-                        {post.category}
+                        {post.category || 'Uncategorized'}
                       </span>
                     </div>
 
@@ -150,7 +163,7 @@ export default async function BlogPage() {
                         <span>•</span>
                         <span className="flex items-center gap-1">
                           <Clock className="w-3 h-3" />
-                          {post.readTime}
+                          {post.readTime || '5 min read'}
                         </span>
                       </div>
 
@@ -159,7 +172,7 @@ export default async function BlogPage() {
                       </h3>
 
                       <p className="text-charcoal-600 text-sm leading-relaxed mb-4 flex-grow">
-                        {post.excerpt}
+                        {post.excerpt || 'No excerpt available'}
                       </p>
 
                       <div className="flex items-center gap-2 text-pumpkin-500 text-sm font-light">

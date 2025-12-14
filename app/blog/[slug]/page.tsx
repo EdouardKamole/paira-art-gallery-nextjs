@@ -1,6 +1,3 @@
-// FILE: app/blog/[slug]/page.tsx
-// Create folder: app/blog/[slug]/
-// Create file: app/blog/[slug]/page.tsx
 // app/blog/[slug]/page.tsx
 import Link from 'next/link';
 import Image from 'next/image';
@@ -53,22 +50,27 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 // Custom components for PortableText rendering
 const portableTextComponents = {
   types: {
-    image: ({value}: any) => (
-      <div className="my-8 rounded-lg overflow-hidden">
-        <Image
-          src={urlFor(value).width(1200).quality(80).url()}
-          alt={value.alt || 'Blog image'}
-          width={1200}
-          height={800}
-          className="w-full h-auto"
-        />
-        {value.caption && (
-          <p className="text-sm text-charcoal-500 text-center mt-2 italic">
-            {value.caption}
-          </p>
-        )}
-      </div>
-    ),
+    image: ({value}: any) => {
+      if (!value || !value.asset) {
+        return null;
+      }
+      return (
+        <div className="my-8 rounded-lg overflow-hidden">
+          <Image
+            src={urlFor(value).width(1200).quality(80).url()}
+            alt={value.alt || 'Blog image'}
+            width={1200}
+            height={800}
+            className="w-full h-auto"
+          />
+          {value.caption && (
+            <p className="text-sm text-charcoal-500 text-center mt-2 italic">
+              {value.caption}
+            </p>
+          )}
+        </div>
+      );
+    },
   },
   block: {
     h2: ({children}: any) => (
@@ -126,12 +128,20 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
       
       {/* Hero Section */}
       <section className="relative h-[70vh] min-h-[500px] flex items-end overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${urlFor(post.mainImage).width(1920).quality(80).url()})` }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20" />
-        </div>
+        {post.mainImage ? (
+          <>
+            <div
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: `url(${urlFor(post.mainImage).width(1920).quality(80).url()})` }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20" />
+            </div>
+          </>
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-pumpkin-500 to-pumpkin-600">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20" />
+          </div>
+        )}
 
         <div className="relative z-10 w-full pb-16">
           <div className="container-luxury">
@@ -145,7 +155,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
 
             <div className="max-w-4xl">
               <span className="inline-block px-4 py-1 bg-white/90 backdrop-blur-sm text-charcoal-800 text-xs font-light rounded-full mb-6">
-                {post.category}
+                {post.category || 'Uncategorized'}
               </span>
 
               <div className="flex items-center gap-4 mb-6 text-sm text-white/80">
@@ -160,7 +170,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
                 <span>•</span>
                 <span className="flex items-center gap-2">
                   <Clock className="w-4 h-4" />
-                  {post.readTime}
+                  {post.readTime || '5 min read'}
                 </span>
               </div>
 
@@ -179,10 +189,14 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
             
             {/* Article Body */}
             <article className="prose prose-lg max-w-none mb-16">
-              <PortableText 
-                value={post.content} 
-                components={portableTextComponents}
-              />
+              {post.content ? (
+                <PortableText 
+                  value={post.content} 
+                  components={portableTextComponents}
+                />
+              ) : (
+                <p className="text-charcoal-600">No content available for this post.</p>
+              )}
             </article>
 
             {/* Share Section */}
@@ -214,9 +228,11 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
                   )}
                   <div>
                     <h3 className="font-serif text-2xl mb-2">{post.author.name}</h3>
-                    <p className="text-charcoal-600 leading-relaxed mb-4">
-                      {post.author.bio}
-                    </p>
+                    {post.author.bio && (
+                      <p className="text-charcoal-600 leading-relaxed mb-4">
+                        {post.author.bio}
+                      </p>
+                    )}
                     <Link 
                       href="/about" 
                       className="text-pumpkin-500 hover:text-pumpkin-600 transition-colors duration-300 text-sm font-light inline-flex items-center gap-2 group"
@@ -246,21 +262,27 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
                   className="group"
                 >
                   <article className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300">
-                    <div className="aspect-[4/3] overflow-hidden relative">
-                      <div
-                        className="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                        style={{ 
-                          backgroundImage: `url(${urlFor(relatedPost.mainImage).width(800).quality(80).url()})` 
-                        }}
-                      />
+                    <div className="aspect-[4/3] overflow-hidden relative bg-charcoal-100">
+                      {relatedPost.mainImage ? (
+                        <div
+                          className="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                          style={{ 
+                            backgroundImage: `url(${urlFor(relatedPost.mainImage).width(800).quality(80).url()})` 
+                          }}
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-charcoal-400">
+                          <p className="text-sm">No image</p>
+                        </div>
+                      )}
                       <span className="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur-sm text-charcoal-800 text-xs font-light rounded-full">
-                        {relatedPost.category}
+                        {relatedPost.category || 'Uncategorized'}
                       </span>
                     </div>
                     <div className="p-6">
                       <div className="flex items-center gap-2 mb-3 text-xs text-charcoal-500">
                         <Clock className="w-3 h-3" />
-                        {relatedPost.readTime}
+                        {relatedPost.readTime || '5 min read'}
                       </div>
                       <h3 className="font-serif text-xl mb-2 group-hover:text-pumpkin-500 transition-colors duration-300">
                         {relatedPost.title}

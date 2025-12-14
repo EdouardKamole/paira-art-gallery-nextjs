@@ -1,6 +1,6 @@
 // lib/sanity.ts
 import { createClient } from 'next-sanity';
-import imageUrlBuilder from '@sanity/image-url';
+import { createImageUrlBuilder } from '@sanity/image-url'; // ✅ Fixed: Using named export instead of default
 
 // Initialize Sanity client
 export const client = createClient({
@@ -10,8 +10,8 @@ export const client = createClient({
   useCdn: true,
 });
 
-// Image URL builder
-const builder = imageUrlBuilder(client);
+// Image URL builder - ✅ Fixed: Using createImageUrlBuilder
+const builder = createImageUrlBuilder(client);
 
 export function urlFor(source: any) {
   return builder.image(source);

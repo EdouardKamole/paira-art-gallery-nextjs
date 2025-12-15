@@ -1,7 +1,4 @@
 // FILE: app/film/page.tsx
-// Create folder: app/film/
-// Create file: app/film/page.tsx
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -34,28 +31,35 @@ export default function FilmPage() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [showreel, setShowreel] = useState<Video | null>(null);
   const [banner, setBanner] = useState<PageBanner | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
-      // Fetch banner
-      const bannerQuery = `*[_type == "pageBanner" && page == "film" && isActive == true][0]{
-        title, description, backgroundImage
-      }`;
-      const bannerData = await client.fetch(bannerQuery);
-      setBanner(bannerData);
+      try {
+        // Fetch banner
+        const bannerQuery = `*[_type == "pageBanner" && page == "film" && isActive == true][0]{
+          title, description, backgroundImage
+        }`;
+        const bannerData = await client.fetch(bannerQuery);
+        setBanner(bannerData);
 
-      // Fetch videos
-      const videosQuery = `*[_type == "film"] | order(order asc){
-        _id, title, description, thumbnail, videoType, 
-        youtubeUrl, vimeoUrl, videoFile, duration, isShowreel, order
-      }`;
-      const videosData = await client.fetch(videosQuery);
-      
-      const showreelVideo = videosData.find((v: Video) => v.isShowreel);
-      const regularVideos = videosData.filter((v: Video) => !v.isShowreel);
-      
-      setShowreel(showreelVideo);
-      setVideos(regularVideos);
+        // Fetch videos
+        const videosQuery = `*[_type == "film"] | order(order asc){
+          _id, title, description, thumbnail, videoType, 
+          youtubeUrl, vimeoUrl, videoFile, duration, isShowreel, order
+        }`;
+        const videosData = await client.fetch(videosQuery);
+        
+        const showreelVideo = videosData.find((v: Video) => v.isShowreel);
+        const regularVideos = videosData.filter((v: Video) => !v.isShowreel);
+        
+        setShowreel(showreelVideo);
+        setVideos(regularVideos);
+      } catch (error) {
+        console.error('Error fetching film data:', error);
+      } finally {
+        setLoading(false);
+      }
     }
     fetchData();
   }, []);
@@ -76,11 +80,41 @@ export default function FilmPage() {
     return '';
   };
 
+  // Helper function to safely get thumbnail URL
+  const getThumbnailUrl = (thumbnail: any): string => {
+    if (!thumbnail) {
+      return 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800&q=80'; // Fallback image
+    }
+    try {
+      return urlFor(thumbnail).width(800).quality(80).url();
+    } catch (error) {
+      console.error('Error generating thumbnail URL:', error);
+      return 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800&q=80';
+    }
+  };
+
   const bannerTitle = banner?.title || 'Film';
   const bannerDescription = banner?.description || 'Visual narratives that move - cinematography and video production';
   const bannerImage = banner?.backgroundImage 
     ? urlFor(banner.backgroundImage).width(1920).quality(80).url()
     : 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1920&q=80';
+
+  if (loading) {
+    return (
+      <main>
+        <CategoryHero
+          title="Film"
+          description="Loading..."
+          backgroundImage="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1920&q=80"
+        />
+        <section className="py-20 bg-white">
+          <div className="container-luxury text-center">
+            <p className="text-gray-500">Loading videos...</p>
+          </div>
+        </section>
+      </main>
+    );
+  }
 
   return (
     <main>
@@ -135,7 +169,7 @@ export default function FilmPage() {
                       <div
                         className="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
                         style={{ 
-                          backgroundImage: `url(${urlFor(video.thumbnail).width(800).quality(80).url()})` 
+                          backgroundImage: `url(${getThumbnailUrl(video.thumbnail)})` 
                         }}
                       />
                       

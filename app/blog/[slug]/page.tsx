@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { Calendar, ArrowLeft, ArrowRight, Clock, Share2 } from 'lucide-react';
 import { client, urlFor } from '@/lib/sanity';
 import { PortableText } from '@portabletext/react';
+import type { PortableTextComponents } from '@portabletext/react';
 import { notFound } from 'next/navigation';
 
 export const revalidate = 60;
@@ -37,8 +38,9 @@ async function getRelatedPosts(currentSlug: string, category: string) {
   return client.fetch(query, { currentSlug, category });
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const post = await getBlogPost(params.slug);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const post = await getBlogPost(slug);
   if (!post) return { title: 'Post Not Found' };
   
   return {
@@ -48,9 +50,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 // Custom components for PortableText rendering
-const portableTextComponents = {
+const portableTextComponents: PortableTextComponents = {
   types: {
-    image: ({value}: any) => {
+    image: ({ value }: { value: any }) => {
       if (!value || !value.asset) {
         return null;
       }
@@ -73,55 +75,59 @@ const portableTextComponents = {
     },
   },
   block: {
-    h2: ({children}: any) => (
+    h2: ({ children }: { children?: React.ReactNode }) => (
       <h2 className="font-serif text-3xl md:text-4xl font-medium mt-12 mb-6 text-charcoal-900 leading-tight">
         {children}
       </h2>
     ),
-    h3: ({children}: any) => (
+    h3: ({ children }: { children?: React.ReactNode }) => (
       <h3 className="font-serif text-2xl md:text-3xl font-medium mt-8 mb-4 text-charcoal-900">
         {children}
       </h3>
     ),
-    normal: ({children}: any) => (
+    normal: ({ children }: { children?: React.ReactNode }) => (
       <p className="text-lg leading-relaxed mb-6 text-charcoal-700">
         {children}
       </p>
     ),
-    blockquote: ({children}: any) => (
+    blockquote: ({ children }: { children?: React.ReactNode }) => (
       <blockquote className="border-l-4 border-pumpkin-500 pl-6 my-8 italic text-xl text-charcoal-600">
         {children}
       </blockquote>
     ),
   },
   marks: {
-    strong: ({children}: any) => (
+    strong: ({ children }: { children?: React.ReactNode }) => (
       <strong className="font-semibold text-charcoal-900">{children}</strong>
     ),
-    em: ({children}: any) => (
+    em: ({ children }: { children?: React.ReactNode }) => (
       <em className="italic">{children}</em>
     ),
-    link: ({value, children}: any) => (
-      <a
-        href={value.href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-pumpkin-500 hover:text-pumpkin-600 underline transition-colors duration-300"
-      >
-        {children}
-      </a>
-    ),
+    link: ({ value, children }: { value?: { href?: string }; children?: React.ReactNode }) => {
+      const href = value?.href || '#';
+      return (
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-pumpkin-500 hover:text-pumpkin-600 underline transition-colors duration-300"
+        >
+          {children}
+        </a>
+      );
+    },
   },
 };
 
-export default async function BlogPostPage({ params }: { params: { slug: string } }) {
-  const post = await getBlogPost(params.slug);
+export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const post = await getBlogPost(slug);
   
   if (!post) {
     notFound();
   }
 
-  const relatedPosts = await getRelatedPosts(params.slug, post.category);
+  const relatedPosts = await getRelatedPosts(slug, post.category);
 
   return (
     <main>

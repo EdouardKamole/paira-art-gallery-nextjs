@@ -7,7 +7,7 @@ export const client = createClient({
   projectId: 'yvk99lag',
   dataset: 'production',
   apiVersion: '2024-01-01',
-  useCdn: true,
+  useCdn: false,
 });
 
 // Image URL builder - ✅ Fixed: Using createImageUrlBuilder
